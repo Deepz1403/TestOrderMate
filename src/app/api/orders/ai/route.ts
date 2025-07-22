@@ -75,7 +75,14 @@ export async function PUT(request: Request) {
       );
     }
 
-    const updateData: any = {};
+    interface UpdateOrderData {
+  status?: string;
+  reviewNotes?: string;
+  requiresReview?: boolean;
+  reviewedAt?: Date;
+}
+
+    const updateData: UpdateOrderData = {};
     
     if (status) {
       updateData.status = status;

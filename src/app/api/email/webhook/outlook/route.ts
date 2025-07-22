@@ -35,7 +35,12 @@ export async function POST(request: Request) {
   }
 }
 
-async function processOutlookNotification(notification: any) {
+interface OutlookNotification {
+  resourceData: unknown; // You might want to define a more specific type for resourceData
+  changeType: string;
+}
+
+async function processOutlookNotification(notification: OutlookNotification) {
   try {
     const { resourceData, changeType } = notification;
     

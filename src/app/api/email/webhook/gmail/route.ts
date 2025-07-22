@@ -1,5 +1,16 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
+import { google, gmail_v1 } from 'googleapis';
+import { Buffer } from 'buffer';
+
+interface Header {
+  name?: string | null;
+  value?: string | null;
+}
+
+interface HistoryItem {
+  messagesAdded?: Array<{ message?: { id?: string | null } | null }>;
+}
 
 // Gmail Pub/Sub webhook endpoint
 export async function POST(request: Request) {
@@ -52,16 +63,20 @@ async function processNewEmails(emailAddress: string, historyId: string) {
       historyTypes: ['messageAdded']
     });
 
+    interface HistoryItem {
+  messagesAdded?: Array<{ message?: { id?: string | null } | null }>;
+}
+
     if (!history.data.history) {
       console.log('No new messages found');
       return;
     }
 
     // Process each new message
-    for (const historyItem of history.data.history) {
+    for (const historyItem of history.data.history as HistoryItem[]) {
       if (historyItem.messagesAdded) {
         for (const messageAdded of historyItem.messagesAdded) {
-          await processNewMessage(gmail, messageAdded.message?.id);
+          await processNewMessage(gmail, messageAdded.message?.id as string | undefined);
         }
       }
     }
@@ -71,7 +86,7 @@ async function processNewEmails(emailAddress: string, historyId: string) {
   }
 }
 
-async function processNewMessage(gmail: any, messageId: string | undefined) {
+async function processNewMessage(gmail: gmail_v1.Gmail, messageId: string | undefined) {
   if (!messageId) return;
   
   try {
@@ -83,16 +98,16 @@ async function processNewMessage(gmail: any, messageId: string | undefined) {
     });
 
     // Extract email content and metadata
-    const headers = message.data.payload.headers || [];
-    const subject = headers.find((h: any) => h.name === 'Subject')?.value || '';
-    const from = headers.find((h: any) => h.name === 'From')?.value || '';
-    const date = headers.find((h: any) => h.name === 'Date')?.value || '';
+        const headers: Header[] = message.data.payload?.headers || [];
+    const subject = headers.find((h) => h.name === 'Subject')?.value || '';
+    const from = headers.find((h) => h.name === 'From')?.value || '';
+    const date = headers.find((h) => h.name === 'Date')?.value || '';
     
     // Get email body
     let emailContent = '';
-    if (message.data.payload.body?.data) {
+    if (message.data.payload?.body?.data) {
       emailContent = Buffer.from(message.data.payload.body.data, 'base64').toString();
-    } else if (message.data.payload.parts) {
+    } else if (message.data.payload?.parts) {
       // Handle multipart messages
       for (const part of message.data.payload.parts) {
         if (part.mimeType === 'text/plain' && part.body?.data) {
@@ -128,7 +143,6 @@ async function processNewMessage(gmail: any, messageId: string | undefined) {
 async function getGmailInstance() {
   // This would typically use OAuth2 credentials stored in your database
   // For now, returning a placeholder - you'll need to implement proper OAuth2 flow
-  const { google } = require('googleapis');
   
   const oauth2Client = new google.auth.OAuth2(
     process.env.GMAIL_CLIENT_ID,

@@ -1,14 +1,5 @@
 import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Package } from 'lucide-react';
 
-const salesData = [
-  { month: 'Jan', sales: 12000, orders: 145 },
-  { month: 'Feb', sales: 15000, orders: 178 },
-  { month: 'Mar', sales: 18000, orders: 203 },
-  { month: 'Apr', sales: 22000, orders: 256 },
-  { month: 'May', sales: 19000, orders: 221 },
-  { month: 'Jun', sales: 25000, orders: 289 },
-];
-
 const categoryData = [
   { name: 'Electronics', value: 45, color: '#3B82F6' },
   { name: 'Accessories', value: 25, color: '#10B981' },
@@ -25,8 +16,6 @@ const topProducts = [
 ];
 
 export default function AnalyticsPage() {
-  const averageRating = 4.6;
-  const totalReviews = 250;
 
   return (
     <div className="space-y-6">
