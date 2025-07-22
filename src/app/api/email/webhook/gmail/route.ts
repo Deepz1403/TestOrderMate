@@ -20,10 +20,10 @@ export async function POST(request: Request) {
     const body = await request.json();
     
     // Verify the request is from Google
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // const authHeader = request.headers.get('authorization');
+    // if (!authHeader) {
+    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // }
 
     // Extract the Pub/Sub message
     const { message } = body;
